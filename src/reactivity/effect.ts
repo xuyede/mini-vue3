@@ -9,15 +9,26 @@ class ReactiveEffect {
 
     run () {
         activeEffect = this;
-        this._fn();
+        const result = this._fn();
         activeEffect = undefined;
+
+        return result;
     }
 }
 
-export function effect (fn) {
+export interface ReactiveEffectRunner<T = any> {
+    (): T
+    effect: ReactiveEffect
+}
+
+export function effect<T = any> (fn: () => T): ReactiveEffectRunner {
     const _effect = new ReactiveEffect(fn);
 
     _effect.run();
+
+    const runner = _effect.run.bind(_effect) as ReactiveEffectRunner
+    runner.effect = _effect
+    return runner
 }
 
 const targetMap = new WeakMap()
