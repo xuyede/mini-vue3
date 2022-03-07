@@ -1,9 +1,23 @@
-let activeEffect = undefined;
+let activeEffect: ReactiveEffect | undefined;
+
+class ReactiveEffect {
+    private _fn: any
+
+    constructor (fn) {
+        this._fn = fn
+    }
+
+    run () {
+        activeEffect = this;
+        this._fn();
+        activeEffect = undefined;
+    }
+}
 
 export function effect (fn) {
-    activeEffect = fn;
-    fn()
-    activeEffect = undefined
+    const _effect = new ReactiveEffect(fn);
+
+    _effect.run();
 }
 
 const targetMap = new WeakMap()
@@ -36,6 +50,6 @@ export function trigger (target, key) {
     const dep = depsMap.get(key)
 
     for (let effect of dep) {
-        effect()
+        effect.run()
     }
 }
