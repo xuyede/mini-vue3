@@ -1,3 +1,5 @@
+import { extend } from '../shared/index'
+
 let activeEffect: ReactiveEffect | undefined;
 
 class ReactiveEffect {
@@ -21,8 +23,19 @@ export interface ReactiveEffectRunner<T = any> {
     effect: ReactiveEffect
 }
 
-export function effect<T = any> (fn: () => T): ReactiveEffectRunner {
+export interface ReactiveEffectOptions {
+    scheduler?: (...args: any[]) => any 
+}
+
+export function effect<T = any> (
+    fn: () => T,
+    options?: ReactiveEffectOptions
+): ReactiveEffectRunner {
     const _effect = new ReactiveEffect(fn);
+
+    if (options) {
+        extend(_effect, options);
+    }
 
     _effect.run();
 
@@ -61,6 +74,10 @@ export function trigger (target, key) {
     const dep = depsMap.get(key)
 
     for (let effect of dep) {
-        effect.run()
+        if (effect.scheduler) {
+            effect.scheduler()
+        } else {
+            effect.run()
+        }
     }
 }
