@@ -5,16 +5,36 @@ let activeEffect: ReactiveEffect | undefined;
 class ReactiveEffect {
     private _fn: any
 
+    private active:boolean =  true
+
+    public deps: Set<ReactiveEffect>[] = []
+
     constructor (fn) {
         this._fn = fn
     }
 
     run () {
+        if (!this.active) {
+            return this._fn();
+        }
+
         activeEffect = this;
         const result = this._fn();
         activeEffect = undefined;
 
         return result;
+    }
+
+    stop () {
+        if (this.active) {
+            this.deps.forEach(dep => {
+                dep.delete(this);
+            })
+    
+            this.deps.length = 0;
+
+            this.active = false;
+        }
     }
 }
 
@@ -44,6 +64,10 @@ export function effect<T = any> (
     return runner
 }
 
+export function stop (runner: ReactiveEffectRunner) {
+    runner.effect.stop();
+}
+
 const targetMap = new WeakMap()
 
 export function track (target, key) {
@@ -62,6 +86,7 @@ export function track (target, key) {
 
         if (!dep.has(activeEffect)) {
             dep.add(activeEffect)
+            activeEffect.deps.push(dep);
         }
     }
 }
