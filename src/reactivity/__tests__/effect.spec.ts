@@ -1,7 +1,7 @@
 import { reactive } from '../reactive'
 import { effect, stop } from '../effect'
 
-describe('effect', () => {
+describe('reactivify/effect', () => {
     it('happy path', () => {
 
         const user = reactive({

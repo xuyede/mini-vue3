@@ -1,6 +1,6 @@
 import { reactive } from '../reactive';
 
-describe('reactive', () => {
+describe('reactivity/reactive', () => {
     it('happy path', () => {
         const raw = { 
             age: 18
