@@ -3,11 +3,11 @@ import { extend } from '../shared/index'
 let activeEffect: ReactiveEffect | undefined;
 
 class ReactiveEffect {
-    private _fn: any
-
-    private active:boolean =  true
-
     public deps: Set<ReactiveEffect>[] = []
+
+    private _fn: any
+    private active:boolean =  true
+    private onStop?: () => void
 
     constructor (fn) {
         this._fn = fn
@@ -27,15 +27,23 @@ class ReactiveEffect {
 
     stop () {
         if (this.active) {
-            this.deps.forEach(dep => {
-                dep.delete(this);
-            })
-    
-            this.deps.length = 0;
+            cleanupEffect(this)
+
+            if (this.onStop) {
+                this.onStop();
+            }
 
             this.active = false;
         }
     }
+}
+
+function cleanupEffect (effect: ReactiveEffect) {
+    effect.deps.forEach(dep => {
+        dep.delete(effect);
+    })
+
+    effect.deps.length = 0;
 }
 
 export interface ReactiveEffectRunner<T = any> {
@@ -44,7 +52,8 @@ export interface ReactiveEffectRunner<T = any> {
 }
 
 export interface ReactiveEffectOptions {
-    scheduler?: (...args: any[]) => any 
+    onStop?: () => void;
+    scheduler?: (...args: any[]) => any;
 }
 
 export function effect<T = any> (
