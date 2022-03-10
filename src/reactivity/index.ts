@@ -1,3 +1,3 @@
 export {
-    reactive
+	reactive
 } from './reactive'
