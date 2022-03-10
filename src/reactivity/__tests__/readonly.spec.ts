@@ -1,4 +1,4 @@
-import { readonly } from "../reactive";
+import { isReadonly, readonly } from "../reactive";
 
 describe('reactivify/readonly', () => {
     it('happy path', () => {
@@ -7,6 +7,7 @@ describe('reactivify/readonly', () => {
         const readonlyRaw = readonly(raw)
         expect(readonlyRaw).not.toBe(raw)
         expect(readonlyRaw.foo).toBe(1)
+        expect(isReadonly(readonlyRaw)).toBe(true)
     })
 
     it('should not allow mutation', () => {
