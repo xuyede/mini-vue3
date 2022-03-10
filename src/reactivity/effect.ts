@@ -1,6 +1,8 @@
+import type { Target } from './reactive';
 import { extend } from '../shared/index'
 
-let activeEffect: ReactiveEffect | undefined;
+export let activeEffect: ReactiveEffect | undefined;
+export let shouldTrack = true;
 
 class ReactiveEffect {
     public deps: Set<ReactiveEffect>[] = []
@@ -18,8 +20,12 @@ class ReactiveEffect {
             return this._fn();
         }
 
+        shouldTrack = true;
         activeEffect = this;
+
         const result = this._fn();
+
+        shouldTrack = false;
         activeEffect = undefined;
 
         return result;
@@ -28,22 +34,22 @@ class ReactiveEffect {
     stop () {
         if (this.active) {
             cleanupEffect(this)
-
             if (this.onStop) {
                 this.onStop();
             }
-
             this.active = false;
         }
     }
 }
 
 function cleanupEffect (effect: ReactiveEffect) {
-    effect.deps.forEach(dep => {
-        dep.delete(effect);
-    })
-
-    effect.deps.length = 0;
+    const { deps } = effect
+    if (deps.length) {
+        for (let i = 0; i < deps.length; i++) {
+            deps[i].delete(effect);
+        }
+        deps.length = 0;
+    }
 }
 
 export interface ReactiveEffectRunner<T = any> {
@@ -79,28 +85,26 @@ export function stop (runner: ReactiveEffectRunner) {
 
 const targetMap = new WeakMap()
 
-export function track (target, key) {
-    if (activeEffect) {
+export function track (target: Target, key: string) {
+    if (shouldTrack && activeEffect) {
         let depsMap = targetMap.get(target)
         if (!depsMap) {
-            depsMap = new Map()
-            targetMap.set(target, depsMap)
+            targetMap.set(target, (depsMap = new Map()))
         }
 
         let dep = depsMap.get(key)
         if (!dep) {
-            dep = new Set()
-            depsMap.set(key, dep)
+            depsMap.set(key,  (dep = new Set()))
         }
 
         if (!dep.has(activeEffect)) {
             dep.add(activeEffect)
-            activeEffect.deps.push(dep);
+            activeEffect!.deps.push(dep);
         }
     }
 }
 
-export function trigger (target, key) {
+export function trigger (target: Target, key: string) {
     const depsMap = targetMap.get(target)
 
     if (!depsMap) return
