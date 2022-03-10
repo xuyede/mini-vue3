@@ -20,4 +20,17 @@ describe('reactivify/readonly', () => {
 		raw.age = 12
 		expect(console.warn).toBeCalled()
 	})
+
+	it('should readonly nested object', () => {
+		const raw = {
+			array: [{ bar: 2 }],
+			nested: {
+				foo: 1
+			}
+		}
+		const readonlyRaw = readonly(raw)
+		expect(isReadonly(readonlyRaw.array)).toBe(true)
+		expect(isReadonly(readonlyRaw.nested)).toBe(true)
+		expect(isReadonly(readonlyRaw.array[0])).toBe(true)
+	})
 })

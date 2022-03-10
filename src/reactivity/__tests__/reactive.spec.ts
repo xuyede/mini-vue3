@@ -10,4 +10,18 @@ describe('reactivity/reactive', () => {
 		expect(proxyRaw.age).toBe(18)
 		expect(isReactive(proxyRaw)).toBe(true)
 	})
+
+	it('should reactive nested object', () => {
+		const raw = {
+			array: [{ bar: 2 }],
+			nested: {
+				foo: 1
+			}
+		}
+
+		const proxyRaw = reactive(raw)
+		expect(isReactive(proxyRaw.nested)).toBe(true)
+		expect(isReactive(proxyRaw.array)).toBe(true)
+		expect(isReactive(proxyRaw.array[0])).toBe(true)
+	})
 })
