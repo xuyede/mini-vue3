@@ -1,4 +1,4 @@
-import { isReadonly, readonly } from "../reactive";
+import { isProxy, isReadonly, readonly } from "../reactive";
 
 describe('reactivify/readonly', () => {
 	it('happy path', () => {
@@ -8,6 +8,9 @@ describe('reactivify/readonly', () => {
 		expect(readonlyRaw).not.toBe(raw)
 		expect(readonlyRaw.foo).toBe(1)
 		expect(isReadonly(readonlyRaw)).toBe(true)
+		expect(isReadonly(raw)).toBe(false)
+		expect(isProxy(readonlyRaw)).toBe(true)
+		expect(isProxy(raw)).toBe(false)
 	})
 
 	it('should not allow mutation', () => {

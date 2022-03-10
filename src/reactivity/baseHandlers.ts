@@ -15,7 +15,6 @@ function createGetter(isReadonly = false, shallow = false) {
 			return isReadonly
 		}
 
-
 		const result = Reflect.get(target, key, receive);
 
 		if (!isReadonly) {
