@@ -10,15 +10,15 @@ export interface Target {
 	[ReactiveFlags.IS_READONLY]?: boolean
 }
 
-export function reactive(raw) {
-	return createActiveObject(raw, mutableHandlers)
+export function reactive(raw: object) {
+	return createReactiveObject(raw, mutableHandlers)
 }
 
-export function readonly(raw) {
-	return createActiveObject(raw, readonlyHandlers)
+export function readonly(raw: object) {
+	return createReactiveObject(raw, readonlyHandlers)
 }
 
-function createActiveObject(raw, baseHandlers) {
+function createReactiveObject(raw: Target, baseHandlers: ProxyHandler<any>) {
 	return new Proxy(raw, baseHandlers)
 }
 
