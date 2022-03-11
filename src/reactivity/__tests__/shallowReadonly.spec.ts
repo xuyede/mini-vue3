@@ -1,6 +1,6 @@
 import { isReadonly, shallowReadonly } from "../reactive";
 
-describe('shallowReadonly', () => {
+describe('reactivify/shallowReadonly', () => {
   it('happy path', () => {
     const raw = { foo: 1, bar: { baz: 2 } };
 
