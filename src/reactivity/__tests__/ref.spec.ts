@@ -3,14 +3,40 @@ import { ref } from "../ref"
 
 describe('reactivify/ref', () => {
   it('happy path', () => {
-    const age = ref(0)
+    const a = ref(1)
+    expect(a.value).toBe(1)
+    a.value = 2
+    expect(a.value).toBe(2)
+  })
 
-    let newAge
+  it('should be reactive', () => {
+    const a = ref(1)
+    let dummy
+    let calls = 0
     effect(() => {
-      newAge = age.value
+      calls++
+      dummy = a.value
     })
-    expect(newAge).toBe(0)
-    age.value++
-    expect(newAge).toBe(1)
+    expect(calls).toBe(1)
+    expect(dummy).toBe(1)
+    a.value = 2
+    expect(calls).toBe(2)
+    expect(dummy).toBe(2)
+    // same value should not trigger
+    a.value = 2
+    expect(calls).toBe(2)
+  })
+
+  it('should make nested properties reactive', () => {
+    const a = ref({
+      count: 1
+    })
+    let dummy
+    effect(() => {
+      dummy = a.value.count
+    })
+    expect(dummy).toBe(1)
+    a.value.count = 2
+    expect(dummy).toBe(2)
   })
 })

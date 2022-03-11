@@ -4,7 +4,7 @@ import { extend } from '../shared/index'
 export let activeEffect: ReactiveEffect | undefined;
 export let shouldTrack = true;
 
-class ReactiveEffect {
+export class ReactiveEffect {
 	public deps: Set<ReactiveEffect>[] = []
 
 	private _fn: any
@@ -97,10 +97,14 @@ export function track(target: Target, key: string) {
 			depsMap.set(key, (dep = new Set()))
 		}
 
-		if (!dep.has(activeEffect)) {
-			dep.add(activeEffect)
-			activeEffect!.deps.push(dep);
-		}
+		trackEffects(dep)
+	}
+}
+
+export function trackEffects(dep: Set<ReactiveEffect>) {
+	if (!dep.has(activeEffect!)) {
+		dep.add(activeEffect!)
+		activeEffect!.deps.push(dep);
 	}
 }
 
@@ -111,6 +115,10 @@ export function trigger(target: Target, key: string) {
 
 	const dep = depsMap.get(key)
 
+	triggerEffects(dep)
+}
+
+export function triggerEffects(dep) {
 	for (let effect of dep) {
 		if (effect.scheduler) {
 			effect.scheduler()
