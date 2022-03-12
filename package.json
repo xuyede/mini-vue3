@@ -6,11 +6,14 @@
   "author": "xuyede <will3virgo@163.com>",
   "license": "MIT",
   "devDependencies": {
+    "@antfu/eslint-config": "^0.18.8",
     "@babel/core": "^7.17.5",
     "@babel/preset-env": "^7.16.11",
     "@babel/preset-typescript": "^7.16.7",
     "@types/jest": "^27.4.1",
+    "add": "^2.0.6",
     "babel-jest": "^27.5.1",
+    "eslint": "^8.11.0",
     "jest": "^27.5.1",
     "nodemon": "^2.0.15",
     "typescript": "^4.6.2"

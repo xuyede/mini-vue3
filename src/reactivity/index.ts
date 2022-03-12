@@ -1,5 +1,5 @@
-export { reactive } from "./reactive";
+export { reactive } from './reactive'
 
-export { effect, track, trigger } from "./effect";
+export { effect, track, trigger } from './effect'
 
-export { ref } from "./ref";
+export { ref } from './ref'

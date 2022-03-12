@@ -1,23 +1,24 @@
-import { createDep } from "./dep"
-import { activeEffect, ReactiveEffect, shouldTrack, trackEffects, triggerEffects } from "./effect"
-import { toReactive } from "./reactive"
+import { createDep } from './dep'
+import type { ReactiveEffect } from './effect'
+import { activeEffect, shouldTrack, trackEffects, triggerEffects } from './effect'
+import { toReactive } from './reactive'
 
 class RefImpl<T> {
   private _value: T
   public dep?: Set<ReactiveEffect> = undefined
 
-  constructor (value: T, is_shallow?: boolean) {
+  constructor(value: T, is_shallow?: boolean) {
     this._value = is_shallow ? value : toReactive(value)
   }
 
-  get value () {
+  get value() {
     if (shouldTrack && activeEffect) {
       trackEffects(this.dep || (this.dep = createDep()))
     }
     return this._value
   }
 
-  set value (newValue) {
+  set value(newValue) {
     if (this._value !== newValue) {
       this._value = newValue
 

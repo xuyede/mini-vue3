@@ -1,5 +1,5 @@
-import { effect } from "../effect"
-import { ref } from "../ref"
+import { effect } from '../effect'
+import { ref } from '../ref'
 
 describe('reactivify/ref', () => {
   it('happy path', () => {
@@ -29,7 +29,7 @@ describe('reactivify/ref', () => {
 
   it('should make nested properties reactive', () => {
     const a = ref({
-      count: 1
+      count: 1,
     })
     let dummy
     effect(() => {

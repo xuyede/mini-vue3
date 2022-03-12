@@ -1,0 +1,7 @@
+{
+  "extends": "@antfu", 
+  "rules": {
+    "import/no-mutable-exports": "off",
+    "curly": "off"
+  }
+}
