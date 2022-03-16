@@ -7,8 +7,8 @@ class RefImpl<T> {
   private _value: T
   public dep?: Set<ReactiveEffect> = undefined
 
-  constructor(value: T, is_shallow?: boolean) {
-    this._value = is_shallow ? value : toReactive(value)
+  constructor(value: T, isShallow?: boolean) {
+    this._value = isShallow ? value : toReactive(value)
   }
 
   get value() {
@@ -30,6 +30,9 @@ class RefImpl<T> {
 }
 
 export function ref(raw) {
-  const r = new RefImpl(raw, false)
-  return r
+  return new RefImpl(raw, false)
+}
+
+export function shallowRef(raw) {
+  return new RefImpl(raw, true)
 }
