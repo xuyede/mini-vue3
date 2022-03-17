@@ -39,4 +39,15 @@ describe('reactivify/ref', () => {
     a.value.count = 2
     expect(dummy).toBe(2)
   })
+
+  it('should work without initial value', () => {
+    const a = ref()
+    let dummy
+    effect(() => {
+      dummy = a.value
+    })
+    expect(dummy).toBe(undefined)
+    a.value = 2
+    expect(dummy).toBe(2)
+  })
 })
