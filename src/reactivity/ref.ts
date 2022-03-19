@@ -5,10 +5,12 @@ import { toReactive } from './reactive'
 
 class RefImpl<T> {
   private _value: T
+  public readonly __v_isRef = true
   public dep?: Set<ReactiveEffect> = undefined
 
-  constructor(value: T, isShallow?: boolean) {
-    this._value = isShallow ? value : toReactive(value)
+  constructor(value: T, public readonly __v_isShallow?: boolean) {
+    this._value = __v_isShallow ? value : toReactive(value)
+    this.__v_isRef = true
   }
 
   get value() {
@@ -29,10 +31,26 @@ class RefImpl<T> {
   }
 }
 
-export function ref(raw) {
-  return new RefImpl(raw, false)
+export function isRef(r: any) {
+  return !!(r && r.__v_isRef === true)
 }
 
-export function shallowRef(raw) {
-  return new RefImpl(raw, true)
+export function unRef(r: any) {
+  return isRef(r) ? r.value : r
+}
+
+function createRef(raw, shallow: boolean) {
+  if (isRef(raw)) {
+    return raw
+  }
+
+  return new RefImpl(raw, shallow)
+}
+
+export function ref(raw?) {
+  return createRef(raw, false)
+}
+
+export function shallowRef(raw?) {
+  return createRef(raw, true)
 }
