@@ -1,6 +1,6 @@
 import { effect } from '../effect'
 import { reactive } from '../reactive'
-import { isRef, ref, unRef } from '../ref'
+import { isRef, proxyRefs, ref, unRef } from '../ref'
 
 describe('reactivify/ref', () => {
   it('happy path', () => {
@@ -67,5 +67,38 @@ describe('reactivify/ref', () => {
     const a = ref(1)
     expect(unRef(a)).toBe(1)
     expect(unRef(1)).toBe(1)
+  })
+
+  it('should pass proxyRefs methods', () => {
+    const user = {
+      age: ref(10),
+      name: 'ddd',
+    }
+
+    const reactiveUser = reactive({
+      age: ref(10),
+      name: 'ddd',
+    })
+
+    const obj = proxyRefs(user)
+    const rObj = proxyRefs(reactiveUser)
+
+    // get -> unRef
+    expect(user.age.value).toBe(10)
+    expect(obj.age).toBe(10)
+    expect(obj.name).toBe('ddd')
+
+    // set -> !isRef -> set ref.value
+    obj.age = 20
+    expect(obj.age).toBe(20)
+    expect(user.age.value).toBe(20)
+
+    // set -> isRef -> set
+    obj.age = ref(10)
+    expect(obj.age).toBe(10)
+    expect(user.age.value).toBe(10)
+
+    expect(rObj.age).toBe(10)
+    expect(rObj.name).toBe('ddd')
   })
 })

@@ -1,7 +1,7 @@
 import { createDep } from './dep'
 import type { ReactiveEffect } from './effect'
 import { activeEffect, shouldTrack, trackEffects, triggerEffects } from './effect'
-import { toReactive } from './reactive'
+import { isReactive, toReactive } from './reactive'
 
 class RefImpl<T> {
   private _value: T
@@ -53,4 +53,26 @@ export function ref(raw?) {
 
 export function shallowRef(raw?) {
   return createRef(raw, true)
+}
+
+const shallowUnwrapHandlers = {
+  get(target, key, receive) {
+    return unRef(Reflect.get(target, key, receive))
+  },
+  set(target, key, value, receive) {
+    const oldValue = target[key]
+    if (isRef(oldValue) && !isRef(value)) {
+      oldValue.value = value
+      return true
+    }
+
+    return Reflect.set(target, key, value, receive)
+  },
+}
+
+// 用于模板解析 setup 吐出来的ref
+export function proxyRefs<T extends object>(raw: T) {
+  return isReactive(raw)
+    ? raw
+    : new Proxy(raw, shallowUnwrapHandlers)
 }

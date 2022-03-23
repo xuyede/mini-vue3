@@ -1,6 +1,7 @@
-import { isObject } from '../shared'
+import { isArray, isIntegerKey, isObject } from '../shared'
 import { track, trigger } from './effect'
 import { ReactiveFlags, reactive, readonly } from './reactive'
+import { isRef } from './ref'
 
 const get = createGetter()
 const set = createSetter()
@@ -16,6 +17,8 @@ function createGetter(isReadonly = false, shallow = false) {
       return isReadonly
     }
 
+    const targetIsArray = isArray(target)
+
     const result = Reflect.get(target, key, receive)
 
     if (!isReadonly) {
@@ -24,6 +27,11 @@ function createGetter(isReadonly = false, shallow = false) {
 
     if (shallow) {
       return result
+    }
+
+    if (isRef(result)) {
+      const shouldUnRef = !targetIsArray || !isIntegerKey(key)
+      return shouldUnRef ? result.value : result
     }
 
     if (isObject(result)) {
