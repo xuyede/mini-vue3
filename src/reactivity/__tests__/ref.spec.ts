@@ -1,6 +1,6 @@
 import { effect } from '../effect'
 import { reactive } from '../reactive'
-import { isRef, proxyRefs, ref, unRef } from '../ref'
+import { isRef, proxyRefs, ref, shallowRef, unRef } from '../ref'
 
 describe('reactivify/ref', () => {
   it('happy path', () => {
@@ -100,5 +100,25 @@ describe('reactivify/ref', () => {
 
     expect(rObj.age).toBe(10)
     expect(rObj.name).toBe('ddd')
+  })
+
+  it.only('should pass shallowRef methods', () => {
+    const objRef = shallowRef({ age: 0 })
+    let count1
+    effect(() => {
+      count1 = objRef.value.age
+    })
+    expect(count1).toBe(0)
+    objRef.value.age++
+    expect(count1).toBe(0)
+
+    const norRef = shallowRef(0)
+    let count2
+    effect(() => {
+      count2 = norRef.value
+    })
+    expect(count2).toBe(0)
+    norRef.value++
+    expect(count2).toBe(1)
   })
 })

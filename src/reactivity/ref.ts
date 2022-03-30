@@ -1,3 +1,4 @@
+import { hasChanged } from '../shared'
 import { createDep } from './dep'
 import type { ReactiveEffect } from './effect'
 import { activeEffect, shouldTrack, trackEffects, triggerEffects } from './effect'
@@ -5,12 +6,13 @@ import { isReactive, toReactive } from './reactive'
 
 class RefImpl<T> {
   private _value: T
+  private _rawValue: T
   public readonly __v_isRef = true
   public dep?: Set<ReactiveEffect> = undefined
 
   constructor(value: T, public readonly __v_isShallow?: boolean) {
     this._value = __v_isShallow ? value : toReactive(value)
-    this.__v_isRef = true
+    this._rawValue = value
   }
 
   get value() {
@@ -21,8 +23,9 @@ class RefImpl<T> {
   }
 
   set value(newValue) {
-    if (this._value !== newValue) {
-      this._value = newValue
+    if (hasChanged(newValue, this._rawValue)) {
+      this._rawValue = newValue
+      this._value = this.__v_isShallow ? newValue : toReactive(newValue)
 
       if (this.dep) {
         triggerEffects(this.dep)

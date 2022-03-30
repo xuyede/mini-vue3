@@ -13,3 +13,7 @@ export const isIntegerKey = key =>
   && key !== 'NaN'
   && key[0] !== '-'
   && `${parseInt(key, 10)}` === key
+
+export const hasChanged = (value, oldValue) => {
+  return !Object.is(value, oldValue)
+}
