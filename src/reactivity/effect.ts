@@ -1,6 +1,8 @@
 import { extend } from '../shared/index'
 import type { Target } from './reactive'
 
+export type EffectScheduler = (...anys: any[]) => any
+
 export let activeEffect: ReactiveEffect | undefined
 export let shouldTrack = true
 
@@ -11,7 +13,10 @@ export class ReactiveEffect {
   private active = true
   private onStop?: () => void
 
-  constructor(fn) {
+  constructor(
+    fn,
+    public scheduler: EffectScheduler | null = null,
+  ) {
     this._fn = fn
   }
 
