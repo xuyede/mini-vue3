@@ -102,7 +102,7 @@ describe('reactivify/ref', () => {
     expect(rObj.name).toBe('ddd')
   })
 
-  it.only('should pass shallowRef methods', () => {
+  it('should pass shallowRef methods', () => {
     const objRef = shallowRef({ age: 0 })
     let count1
     effect(() => {

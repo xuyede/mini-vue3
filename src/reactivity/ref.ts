@@ -1,8 +1,26 @@
 import { hasChanged } from '../shared'
+import type { Dep } from './dep'
 import { createDep } from './dep'
 import type { ReactiveEffect } from './effect'
 import { activeEffect, shouldTrack, trackEffects, triggerEffects } from './effect'
 import { isReactive, toReactive } from './reactive'
+
+interface RefBase<T> {
+  dep?: Dep
+  value: T
+}
+
+export function trackRefValue(ref: RefBase<any>) {
+  if (shouldTrack && activeEffect) {
+    trackEffects(ref.dep || (ref.dep = createDep()))
+  }
+}
+
+export function triggerRefValue(ref: RefBase<any>) {
+  if (ref.dep) {
+    triggerEffects(ref.dep)
+  }
+}
 
 class RefImpl<T> {
   private _value: T
@@ -16,9 +34,7 @@ class RefImpl<T> {
   }
 
   get value() {
-    if (shouldTrack && activeEffect) {
-      trackEffects(this.dep || (this.dep = createDep()))
-    }
+    trackRefValue(this)
     return this._value
   }
 
@@ -27,9 +43,7 @@ class RefImpl<T> {
       this._rawValue = newValue
       this._value = this.__v_isShallow ? newValue : toReactive(newValue)
 
-      if (this.dep) {
-        triggerEffects(this.dep)
-      }
+      triggerRefValue(this)
     }
   }
 }
