@@ -24,13 +24,14 @@ export class ComputedRefImpl<T> {
     this.effect = new ReactiveEffect(getter, () => {
       if (!this._dirty) {
         this._dirty = true
-        // triggerRefValue(this)
+        triggerRefValue(this)
       }
     })
   }
 
   get value() {
-    // trackRefValue(this)
+    // use computed in a effect
+    trackRefValue(this)
     if (this._dirty) {
       this._dirty = false
       this._value = this.effect.run()
